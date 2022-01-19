@@ -1,3 +1,5 @@
-<?php $render('header'); ?>
+<?php
+
+$render('header'); ?>
 
 Opa, <?=$nome;?>
