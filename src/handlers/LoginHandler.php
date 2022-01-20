@@ -28,11 +28,11 @@ class LoginHandler {
 
     if($user) {
       if(password_verify($password, $user['password'])) {
-        $token = md5(time().rand(0.9999).time());// gerando o token
+        $token = md5(time().rand(0, 9999).time());// gerando o token
 
         User::update()
           ->set('token', $token)
-           ->where('email', $email)
+          ->where('email', $email)
         ->execute();
 
         return $token;
@@ -42,4 +42,23 @@ class LoginHandler {
     return false;// se não encontra
   }
 
+  public static function emailExists($email) {
+    $user = User::select()->where('email', $email)->one();
+    return $user ? true : false;
+  }
+
+  public static function addUser($name, $email, $birthdate, $password) {
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+    $token = md5(time().rand(0, 9999).time());// gerando o token para logar
+
+    User::insert([
+      'email' => $email,
+      'password' => $hash,
+      'name' => $name,
+      'birthdate' => $birthdate,
+      'token' => $token
+    ])->execute();
+
+    return $token;
+  }
 }
