@@ -10,7 +10,7 @@ class LoginHandler {
       $token = $_SESSION['token'];
 
       $data = User::select()->where('token', $token)->one();
-      if(count($data) > 0) {
+      if(!empty($data)) {
 
         $loggedUser = new User();
         $loggedUser->id = $data['id'];
