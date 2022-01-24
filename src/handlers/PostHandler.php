@@ -20,6 +20,70 @@ class PostHandler {
     }
   }
 
+  public static function _postListToObject($postList, $loggedeUserId) {
+
+    // 3. transformar o resultado em objetos do models
+    $posts = [];
+    foreach($postList as $postItem) {
+      $newPost = new Post();
+      $newPost->id = $postItem['id'];
+      $newPost->type = $postItem['type'];
+      $newPost->created_at = $postItem['created_at'];
+      $newPost->body = $postItem['body'];
+      $newPost->mine = false;
+
+      // verificando se o post é da pessoa que esta logado, caso eu queira editar/deletar
+      if($postItem['id_user'] == $loggedeUserId) {
+        $newPost->mine = true;
+      }
+
+      // 4. preencher as informações adicionais no post
+      $newUser = User::select()->where('id', $postItem['id_user'])->one();
+      $newPost->user = new User();
+      $newPost->user->id = $newUser['id'];
+      $newPost->user->name = $newUser['name'];
+      $newPost->user->avatar = $newUser['avatar'];
+
+      // TODO: 4.1 preencher informações LIKE
+      $newPost->likeCount = 0;
+      $newPost->liked = false;
+
+      // TODO: 4.2 preencher informações de COMMETS
+      $newPost->comments = [];
+
+      $posts[] = $newPost;
+    }
+
+    return $posts;
+  }
+
+  public static function getUserFedd($idUser, $page, $loggedeUserId) {
+    $perPage = 2;
+
+    // 2. pegar os post do usuario.
+    $postList = Post::select()
+      ->where('id_user', $idUser)
+      ->orderBy('created_at', 'desc')
+      ->page($page, $perPage)
+    ->get();
+
+    // esta condição retona quantos post tem
+    $total = Post::select()
+      ->where('id_user', $idUser)
+    ->count();
+    $pageCount = ceil($total / $perPage);
+
+    // 3. transformar o resultado em objetos do models
+    $posts = self::_postListToObject($postList, $loggedeUserId);
+
+    // 5. retornar o resultado.
+    return [
+     'posts' => $posts,
+     'pageCount' => $pageCount,
+     'currentPage' => $page// pagina atual
+    ];
+  }
+
   public static function getHomeFeed($idUser, $page) {
     $perPage = 2;
     // 1. pegar lista de usuários que EU sigo.
@@ -45,41 +109,34 @@ class PostHandler {
     $pageCount = ceil($total / $perPage);
 
     // 3. transformar o resultado em objetos do models
-    $posts = [];
-    foreach($postList as $postItem) {
-      $newPost = new Post();
-      $newPost->id = $postItem['id'];
-      $newPost->type = $postItem['type'];
-      $newPost->created_at = $postItem['created_at'];
-      $newPost->body = $postItem['body'];
-      $newPost->mine = false;
+    $posts = self::_postListToObject($postList, $idUser);
 
-      // verificando se o post é da pessoa que esta logado
-      if($postItem['id_user'] == $idUser) {
-        $newPost->mine = true;
-      }
-
-      // 4. preencher as informações adicionais no post
-      $newUser = User::select()->where('id', $postItem['id_user'])->one();
-      $newPost->user = new User();
-      $newPost->user->id = $newUser['id'];
-      $newPost->user->name = $newUser['name'];
-      $newPost->user->avatar = $newUser['avatar'];
-
-      // TODO: 4.1 preencher informações LIKE
-      $newPost->likeCount = 0;
-      $newPost->liked = false;
-
-      // TODO: 4.2 preencher informações de COMMETS
-      $newPost->comments = [];
-
-      $posts[] = $newPost;
-    }
     // 5. retornar o resultado.
     return [
      'posts' => $posts,
      'pageCount' => $pageCount,
      'currentPage' => $page// pagina atual
     ];
+  }
+
+  public static function getPhotosFrom($idUser) {
+    $photosData = Post::select()
+      ->where('id_user', $idUser)
+      ->where('type', 'photo')
+    ->get();
+
+    $photos = [];
+
+    foreach($photosData as $photo) {
+      $newPost = new Post();
+      $newPost->id = $photo['id'];
+      $newPost->type = $photo['type'];
+      $newPost->created_at = $photo['created_at'];
+      $newPost->body = $photo['body'];// o bosy de uma photo e o link dela
+
+      $photos[] = $newPost;
+    }
+
+    return $photos;
   }
 }

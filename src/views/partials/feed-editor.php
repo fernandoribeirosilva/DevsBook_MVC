@@ -7,7 +7,7 @@
       <div class="feed-new-input-placeholder">O que você está pensando, <?=$user->name;?>?</div>
       <div class="feed-new-input" contenteditable="true"></div>
       <div class="feed-new-send">
-        <img src="assets/images/send.png" />
+        <img src="<?=$base;?>/assets/images/send.png" />
       </div>
       <form class="feed-new-form" action="<?=$base;?>/post/new" method="POST"><!-- amazena o que o usuario digitou no  feed-new-send -->
         <input type="hidden" name="body" />
