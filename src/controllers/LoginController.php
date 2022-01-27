@@ -44,8 +44,7 @@ class LoginController extends Controller
     }
   }
 
-  public function signup()
-  {
+  public function signup() {
     // verificar se tem mensagem de flash(error)
     $flash = '';
     if (!empty($_SESSION['flash'])) {
@@ -58,16 +57,16 @@ class LoginController extends Controller
     ]);
   }
 
+
   // verifica se todos os dados estao prenchidos 
-  public function signupAction()
-  {
+  public function signupAction() {
     $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
     $password = filter_input(INPUT_POST, 'password');
     $birthdate = filter_input(INPUT_POST, 'birthdate');
 
     if ($name && $email && $password && $birthdate) {
-
+      
       $birthdate = explode('/', $birthdate); // dividir onde tem uma barra
       if (count($birthdate) != 3) {
         $_SESSION['flash'] = 'Data de nascimento inválida!';

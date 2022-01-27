@@ -44,3 +44,4 @@ document.querySelector('.feed-new-input').addEventListener('blur', function(obj)
     document.querySelector('.feed-new-input-placeholder').style.display = 'block';
   }
 });
+

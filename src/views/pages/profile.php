@@ -22,7 +22,7 @@
             <?php if (!empty($user->city)) : ?>
               <!-- se cidade tiver prenchida mostra -->
               <div class="user-info-mini">
-                <img src="<?= $base; ?>assets/images/pin.png" />
+                <img src="<?= $base; ?>/assets/images/pin.png" />
                 <?= $user->city; ?>
               </div>
             <?php endif; ?>
@@ -30,7 +30,7 @@
             <?php if (!empty($user->work)) : ?>
               <!-- se trabalho tiver prenchida mostra -->
               <div class="user-info-mini">
-                <img src="<?= $base; ?>assets/images/work.png" />
+                <img src="<?= $base; ?>/assets/images/work.png" />
                 <?= $user->work; ?>
               </div>
             <?php endif; ?>
