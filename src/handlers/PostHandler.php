@@ -2,6 +2,7 @@
 namespace src\handlers;
 
 use \src\models\Post;
+use \src\models\PostLike;
 use \src\models\User;
 use \src\models\UserRelation;
 
@@ -45,8 +46,10 @@ class PostHandler {
       $newPost->user->avatar = $newUser['avatar'];
 
       // TODO: 4.1 preencher informações LIKE
-      $newPost->likeCount = 0;
-      $newPost->liked = false;
+      $likes = PostLike::select()->where('id_post', $postItem['id'])->get();
+      
+      $newPost->likeCount = count($likes);
+      $newPost->liked = self::isLiked($postItem['id'], $loggedeUserId);
 
       // TODO: 4.2 preencher informações de COMMETS
       $newPost->comments = [];
@@ -55,6 +58,34 @@ class PostHandler {
     }
 
     return $posts;
+  }
+
+  public static function isLiked($id, $loggedeUserId) {
+    $myLike = PostLike::select()
+      ->where('id_post', $id)
+      ->where('id_user', $loggedeUserId)
+    ->get();
+
+    if (count($myLike) > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public static function deleteLike($id, $loggedeUserId) {
+    PostLike::delete()
+      ->where('id_post', $id) 
+      ->where('id_user', $loggedeUserId) 
+    ->execute();
+  }
+
+  public static function addLike($id, $loggedeUserId) {
+    PostLike::insert([
+      'id_post' => $id,
+      'id_user' => $loggedeUserId,
+      'created_at' => date('Y-m-d H:i:s')
+    ])->execute();
   }
 
   public static function getUserFedd($idUser, $page, $loggedeUserId) {
